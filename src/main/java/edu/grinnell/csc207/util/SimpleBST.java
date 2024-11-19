@@ -89,8 +89,32 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    */
   @Override
   public V set(K key, V value) {
-    return null;        // STUB
+    BSTNode<K, V> temp = insert(this.root, key, value);
+    if (temp == null) {
+      return null;
+    
+    V cached = this.cachedValue;
+    this.cachedValue = null;
+    return cached;
+    
   } // set(K, V)
+
+  private BSTNode<K, V> insert(BSTNode<K, V> node, K key, V val) {
+    if (this.root == null) {
+      this.root = new BSTNode(key, val);
+    }
+    if (node == null) {
+      return new BSTNode(key, val);
+    } else if (order.compare(key, node.key) < 0) {
+      node.left = insert(node.left, key, val);
+    } else if (order.compare(key, node.key) > 0) {
+      node.right = insert(node.right, key, val);
+    } else {
+      this.cachedValue = node.value;
+      node.value = val;
+    }
+    return null;
+  }
 
   /**
    * Get the value associated with key.
