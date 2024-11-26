@@ -123,9 +123,9 @@ public class SimpleBSTExperiments {
     example.dump(pen);
     pen.println();
 
-    removeExperiment(pen, example, "vicuna"); // leaf?
-    removeExperiment(pen, example, "koala"); // middle?
-    removeExperiment(pen, example, "civet"); // root?
+    //removeExperiment(pen, example, "vicuna"); // leaf?
+    //removeExperiment(pen, example, "koala"); // middle?
+    //removeExperiment(pen, example, "civet"); // root?
   } // main(String[])
 
 } // class SimpleBSTExperiments

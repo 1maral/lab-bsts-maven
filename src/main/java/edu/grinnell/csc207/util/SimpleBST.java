@@ -9,8 +9,8 @@ import java.util.function.BiConsumer;
 /**
  * A simple implementation of binary search trees.
  *
- * @author Your Name Here
- * @author Your Name Here
+ * @author Maral Bat-Erdene
+ * @author Khanh Do
  * @author Samuel A. Rebelsky
  *
  * @param <K>
@@ -89,32 +89,46 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    */
   @Override
   public V set(K key, V value) {
-    BSTNode<K, V> temp = insert(this.root, key, value);
-    if (temp == null) {
-      return null;
-    
+    if (key == null) {
+      throw new NullPointerException();
+    } // if
+
+    // check if the tree is empty
+    if (this.root == null) {
+      // Create root if tree is empty.
+      this.root = new BSTNode<>(key, value);
+    } else {
+      setHelper(key, value, this.root);
+    } // if/else
+
+    // the previous value associated with key
     V cached = this.cachedValue;
     this.cachedValue = null;
     return cached;
-    
   } // set(K, V)
 
-  private BSTNode<K, V> insert(BSTNode<K, V> node, K key, V val) {
-    if (this.root == null) {
-      this.root = new BSTNode(key, val);
-    }
-    if (node == null) {
-      return new BSTNode(key, val);
-    } else if (order.compare(key, node.key) < 0) {
-      node.left = insert(node.left, key, val);
-    } else if (order.compare(key, node.key) > 0) {
-      node.right = insert(node.right, key, val);
-    } else {
+  private void setHelper(K key, V value, BSTNode<K, V> node) {
+    int comparison = order.compare(key, node.key);
+
+    if (comparison == 0) {
+      // save the previous value associated with key
       this.cachedValue = node.value;
-      node.value = val;
-    }
-    return null;
-  }
+      // set the key to a new value
+      node.value = value;
+    } else if (comparison < 0) {
+      if (node.left == null) {
+        node.left = new BSTNode<>(key, value);
+      } else {
+        setHelper(key, value, node.left);
+      } // if/else
+    } else {
+      if (node.right == null) {
+        node.right = new BSTNode<>(key, value);
+      } else {
+        setHelper(key, value, node.right);
+      } // if/else
+    } // if/else
+  } // insert(BSTNode<K, V>, key, val)
 
   /**
    * Get the value associated with key.
@@ -130,9 +144,30 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
   @Override
   public V get(K key) {
     if (key == null) {
-      throw new NullPointerException("null key");
+      throw new NullPointerException();
     } // if
-    return get(key, root);
+    V value = getHelper(key, this.root);
+    if (value == null) {
+      throw new IndexOutOfBoundsException();
+    } // if
+
+    return value;
+  } // get(K, V)
+
+  public V getHelper(K key, BSTNode<K, V> node) {
+    if (this.root == null) {
+      return null;
+    } // if
+    if (order.compare(key, node.key) == 0) {
+      return node.value;
+    } else if (order.compare(key, node.key) < 0) {
+      return getHelper(key, node.left);
+    } else if (order.compare(key, node.key) > 0) {
+      return getHelper(key, node.right);
+    } //if/else
+
+    // if not found after all nodes
+    return null;
   } // get(K, V)
 
   /**
@@ -234,7 +269,22 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    */
   @Override
   public void forEach(BiConsumer<? super K, ? super V> action) {
-    // STUB
+    forHelper(action, this.root);
+  } // forEach
+
+  public void forHelper(BiConsumer<? super K, ? super V> action, BSTNode<K, V> node) {
+    if (node == null) {
+      return;
+    } // if
+    
+    // Traverse the left subtree
+    forHelper(action, node.left);
+
+    // Apply the action to the current node
+    action.accept(node.key, node.value);
+
+    // Traverse the right subtree
+    forHelper(action, node.right);
   } // forEach
 
   // +----------------------+----------------------------------------
@@ -248,7 +298,7 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    *   The PrintWriter used to dump the tree.
    */
   public void dump(PrintWriter pen) {
-    dump(pen, root, "");
+    dump(pen, this.root, "");
   } // dump(PrintWriter)
 
   // +---------+-----------------------------------------------------
